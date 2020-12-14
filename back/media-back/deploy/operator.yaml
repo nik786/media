@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: media-back
+spec:
+  replicas: 1
+  serviceName: media-back
+  selector:
+    matchLabels:
+      app: media-back
+  template:
+    metadata:
+      labels:
+        app: media-back
+    spec:
+      serviceAccountName: media-back
+      containers:
+        - name: media-back
+          # Replace this with the built image name
+          image: nik786/mysql-5:latest
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "media-back"
+
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: ROOT_PASSWORD  
+
+            - name: MYSQL_USER
+              value: wiki
+
+            - name: MYSQL_WIKI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: MYSQL_PASSWORD
+            
+            - name: MYSQL_DATABASE
+              value: wikidb
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: media-back
+  labels:
+    app: media-back
+spec:
+  selector:
+    app: media-back
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+      
+
+

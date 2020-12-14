@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: media-front
+  template:
+    metadata:
+      labels:
+        name: media-front
+    spec:
+      serviceAccountName: media-front
+      containers:
+        - name: media-front
+          # Replace this with the built image name
+          image: nik786/httpd-4:latest
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "media-front"
+            
+            - name: MYSQL_DB
+              value: media-back
+
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: ROOT_PASSWORD  
+
+
+
+
+
+
+
+

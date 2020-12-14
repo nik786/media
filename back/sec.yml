@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+data:
+  ROOT_PASSWORD: mysql1234 
+  MYSQL_PASSWORD: wiki1234
